@@ -1,0 +1,36 @@
+name: Security-Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v2
+        
+      - name: "Run Horusec"
+        run:  |
+          curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/master/deployments/scripts/install.sh | bash -s latest
+          horusec start -p .
+        
+      - name: "Run FOSSA Scan"
+        uses: fossas/fossa-action@v1
+        with:
+          api-key: ${{secrets.fossaApiKey}}
+     # - name: Run Application
+      #  run:  nohup npm run start &
+      #- uses: stackhawk/hawkscan-action@v1.3.2
+       # with:
+         # apiKey: ${{ secrets.HAWK_API_KEY }}
+      - name: Building the container Image
+        run:  |
+          DOCKER_BUILDKIT=1 docker build -t petclinic
+          
+      - name: Running container
+        run:  |
+          docker run --rm -p 8080:8080 --name petclinic petclinic
