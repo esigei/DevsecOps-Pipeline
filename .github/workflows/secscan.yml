@@ -13,12 +13,12 @@ jobs:
       - name: "Checkout Code"
         uses: actions/checkout@v2
         
-      - name: "Run Horusec"
+      - name: "Run Horusec=>SAST"
         run:  |
           curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/master/deployments/scripts/install.sh | bash -s latest
           horusec start -p .
         
-      - name: "Run FOSSA Scan"
+      - name: "Run FOSSA Scan=>SCA"
         uses: fossas/fossa-action@v1
         with:
           api-key: ${{secrets.fossaApiKey}}
@@ -38,6 +38,6 @@ jobs:
         run:  |
           DOCKER_BUILDKIT=1 docker build -t petclinic .
           
-      - name: Running container
-        run:  |
-          docker run --rm -p 8080:8080 --name petclinic petclinic
+      #- name: Running container
+      #  run:  |
+         # docker run --rm -p 8080:8080 --name petclinic petclinic
